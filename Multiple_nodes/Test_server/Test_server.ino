@@ -5,14 +5,18 @@
 */
 #include <SPI.h>  // include libraries
 #include <LoRa.h>
+bool ack_node1 = false;
+bool ack_node2 = false;
+bool timeout_flag = false;
+bool start_time_flag = true;
+int timeout_counter = 0;
 
-
-
-
+long long int attempts = 0;
+int timeout = 20000;
 byte MasterNode = 0xFF;
 byte Node1 = 0xBB;
 byte Node2 = 0xCC;
-String Message= "";
+String Message = "";
 String SenderNode = "";
 String outgoing;  // outgoing message
 
@@ -23,14 +27,15 @@ unsigned long previousMillis = 0;
 unsigned long int previoussecs = 0;
 unsigned long int currentsecs = 0;
 unsigned long currentMillis = 0;
+unsigned long int start_time = 0;
 int interval = 5;  // updated every 1 second
 int Secs = 0;
 #define ss 5
 #define rst 4
 #define dio0 2
-
+int counter1 = 0;
+int counter2 = 0;
 void setup() {
-  //LoRa.setPins(ss, rst, dio0);
   Serial.begin(9600);
   LoRa.setPins(ss, rst, dio0);
   while (!Serial)
@@ -46,28 +51,36 @@ void setup() {
 }
 
 void loop() {
+  currentMillis = millis();
+  currentsecs = currentMillis / 1000;
+  if ((unsigned long)(currentsecs - previoussecs) >= interval) {
+    Secs = Secs + 1;
+    //Serial.println(Secs);
+    if (Secs >= 11) {
+      Secs = 0;
+    }
+    if ((Secs >= 1) && (Secs <= 5)) {
+      String message1 = "00000000";
+      if (ack_node1 == false ) {
+        sendMessage(message1, MasterNode, Node1);
+        Serial.println("message send to node 1 ");
 
+      }
+    }
 
-  
-    Message = " message from server to node 1 ";
-    sendMessage(Message, MasterNode, Node1);
-    //Serial.println("message sent to node 1 ");
-    Serial.println("Sending " + Message);
-  Message = "";     
+    if ((Secs >= 6) && (Secs <= 10)) {
 
-    delay (5000);
-  
+      String message2 = "00000000";
+      if (ack_node2 == false) {
+        sendMessage(message2, MasterNode, Node2);
+        //Serial.println("message send to node 2");
+      }
+    }
 
-    Message = "  message from server to node 2";
-    sendMessage(Message, MasterNode, Node2);
-    //Serial.println("message sent to node 2 ");
-    Serial.println("Sending " + Message);
-    Message ="";
+    previoussecs = currentsecs;
+  }
 
-    delay (5000);
-
-
-    // parse for a packet, and call onReceive with the result:
+  // parse for a packet, and call onReceive with the result:
   onReceive(LoRa.parsePacket());
 }
 
@@ -84,7 +97,10 @@ void sendMessage(String outgoing, byte MasterNode, byte otherNode) {
 }
 
 void onReceive(int packetSize) {
-  if (packetSize == 0) return;  // if there's no packet, return
+  if (packetSize == 0) {
+
+    return;  // if there's no packet, return
+  }
 
   // read packet header bytes:
   int recipient = LoRa.read();  // recipient address
@@ -117,21 +133,26 @@ void onReceive(int packetSize) {
 
 
 
-
+  //from node 1
   if (sender == 0XBB) {
 
-    Serial.print(incoming);
-    Serial.println("from node 1");
-    // print RSSI of packet
-    Serial.print("' with RSSI ");
-    Serial.println(LoRa.packetRssi());
-  }
 
+    if (incoming == "received(1)") {
+      Serial.print(incoming);
+      // print RSSI of packet
+      Serial.print("' Signal power  ");
+      Serial.println(LoRa.packetRssi());
+      ack_node1 = true;
+    }
+  }
+  //from node 2
   if (sender == 0XCC) {
-    Serial.print(incoming);
-    Serial.println("from node 2");
-    // print RSSI of packet
-    Serial.print("' with RSSI ");
-    Serial.println(LoRa.packetRssi());
+    if (incoming == "received(2)") {
+      Serial.print(incoming);
+      // print RSSI of packet
+      Serial.print("' Signal power  ");
+      Serial.println(LoRa.packetRssi());
+      ack_node2 = true;
+    }
   }
 }

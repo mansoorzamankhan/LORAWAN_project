@@ -11,6 +11,7 @@ void setup()
 {
   pinMode(led, OUTPUT);
   Serial.begin(9600);
+  RH_RF95 driver(5, 2);
   while (!Serial) ; // Wait for serial port to be available
   if (!rf95.init())
     Serial.println("init failed");

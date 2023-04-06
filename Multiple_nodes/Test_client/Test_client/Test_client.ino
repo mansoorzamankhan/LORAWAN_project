@@ -10,7 +10,7 @@ https://www.electroniclinic.com/
 #define dio0 2
 
 String outgoing;              // outgoing message
-
+String SenderNode = "";
 byte msgCount = 0;            // count of outgoing messages
 byte MasterNode = 0xFF;     
 byte Node1 = 0xBB;
@@ -21,7 +21,7 @@ void setup() {
   Serial.begin(9600);
   while (!Serial);
 
-  Serial.println("LoRa Receiver node 1");
+  Serial.println("LoRa client node 1");
   if (!LoRa.begin(915E6)) {
     Serial.println("Starting LoRa failed!");
     while (1);
@@ -52,6 +52,8 @@ void onReceive(int packetSize) {
   // read packet header bytes:
   int recipient = LoRa.read();          // recipient address
   byte sender = LoRa.read();            // sender address
+    if (sender == 0XFF)
+    SenderNode = "Master";
   byte incomingMsgId = LoRa.read();     // incoming msg ID
   byte incomingLength = LoRa.read();    // incoming msg length
 
@@ -73,12 +75,19 @@ void onReceive(int packetSize) {
     ;
     return;                             // skip rest of function
   }
-    Serial.println(incoming);
-  
-
-    String message = "I am node 1 "; 
+  if (sender==0xFF)
+  {
+      Serial.print(incoming);
+    // print RSSI of packet
+    Serial.print("' Signal Power ");
+    Serial.println(LoRa.packetRssi());
+     
+    String message = "received(1)"; 
     sendMessage(message,MasterNode,Node1);
     delay(100);
-    
+    }
+  
+
+
   
 }
