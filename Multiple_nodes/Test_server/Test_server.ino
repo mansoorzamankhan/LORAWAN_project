@@ -5,21 +5,16 @@
 */
 #include <SPI.h>  // include libraries
 #include <LoRa.h>
-bool ack_node1 = false;
-bool ack_node2 = false;
-bool timeout_flag = false;
-bool start_time_flag = true;
-int timeout_counter = 0;
+bool ack_node1 = false; // acknowledgement of received message from node 1 
+bool ack_node2 = false;// acknowledgement of received message from node 2
+bool valves[7]={false}; // bolian array for valves
 
-long long int attempts = 0;
-int timeout = 20000;
-byte MasterNode = 0xFF;
-byte Node1 = 0xBB;
-byte Node2 = 0xCC;
+byte MasterNode = 0xFF; // address for master/server node 
+byte Node1 = 0xBB; // client node 1 
+byte Node2 = 0xCC;//client node 2
 String Message = "";
 String SenderNode = "";
 String outgoing;  // outgoing message
-
 byte msgCount = 0;  // count of outgoing messages
 
 // Tracks the time since last event fired
@@ -53,26 +48,26 @@ void setup() {
 void loop() {
   currentMillis = millis();
   currentsecs = currentMillis / 1000;
+  // send paket time (11 second )
   if ((unsigned long)(currentsecs - previoussecs) >= interval) {
     Secs = Secs + 1;
     //Serial.println(Secs);
-    if (Secs >= 11) {
+    if (Secs >= 11) { // reset time after 11 seconds
       Secs = 0;
     }
-    if ((Secs >= 1) && (Secs <= 5)) {
+    if ((Secs >= 1) && (Secs <= 5)) { // in first 5 second send data to node 1 
       String message1 = "00000000";
-      if (ack_node1 == false ) {
-        sendMessage(message1, MasterNode, Node1);
+      if (ack_node1 == false) {// if message is not received by the receiving node1
+        sendMessage(message1, MasterNode, Node1); // send message to node 
         Serial.println("message send to node 1 ");
-
       }
     }
 
-    if ((Secs >= 6) && (Secs <= 10)) {
+    if ((Secs >= 6) && (Secs <= 10)) { // in next 5 seconds send data to node 2
 
       String message2 = "00000000";
-      if (ack_node2 == false) {
-        sendMessage(message2, MasterNode, Node2);
+      if (ack_node2 == false) {// if message is not received by the receiving node2
+        sendMessage(message2, MasterNode, Node2); // send message to node 
         //Serial.println("message send to node 2");
       }
     }
@@ -81,7 +76,7 @@ void loop() {
   }
 
   // parse for a packet, and call onReceive with the result:
-  onReceive(LoRa.parsePacket());
+  onReceive(LoRa.parsePacket());// receive data from client nodes
 }
 
 
@@ -105,10 +100,7 @@ void onReceive(int packetSize) {
   // read packet header bytes:
   int recipient = LoRa.read();  // recipient address
   byte sender = LoRa.read();    // sender address
-  if (sender == 0XBB)
-    SenderNode = "Node1:";
-  if (sender == 0XCC)
-    SenderNode = "Node2:";
+
   byte incomingMsgId = LoRa.read();   // incoming msg ID
   byte incomingLength = LoRa.read();  // incoming msg length
 
@@ -135,24 +127,43 @@ void onReceive(int packetSize) {
 
   //from node 1
   if (sender == 0XBB) {
-
-
-    if (incoming == "received(1)") {
+    if (incoming == "received(Node1)") {
       Serial.print(incoming);
       // print RSSI of packet
       Serial.print("' Signal power  ");
       Serial.println(LoRa.packetRssi());
       ack_node1 = true;
     }
+    if (incoming == "power_on(Node1)") {
+      Serial.println("Node 1 :powered on");
+      // print RSSI of packet
+      ack_node1 = false;
+    }
   }
   //from node 2
   if (sender == 0XCC) {
-    if (incoming == "received(2)") {
+    if (incoming == "received(Node2)") {
       Serial.print(incoming);
       // print RSSI of packet
       Serial.print("' Signal power  ");
       Serial.println(LoRa.packetRssi());
       ack_node2 = true;
     }
+    if (incoming == "power_on(Node2)") {
+      Serial.println("Node 2 :powered on");
+      // print RSSI of packet
+      ack_node2 = false;
+    }
   }
 }
+// void setValve()
+// {
+//   for ( byte i=0 ;i < Num_of_valves;i++)
+//   {
+//         if (  )
+//   {
+//     valve[i]==true;
+//   }
+//   }
+
+// }
