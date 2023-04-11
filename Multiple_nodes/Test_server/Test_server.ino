@@ -91,8 +91,8 @@ void encode_message_data(void) {
   }
 }
 void loop() {
-  set_message_data();
-  encode_message_data();
+  //set_message_data();
+  //encode_message_data();
   currentMillis = millis();
   currentsecs = currentMillis / 1000;
   // send paket time (11 second )
@@ -103,7 +103,7 @@ void loop() {
       Secs = 0;
     }
     if ((Secs >= 1) && (Secs <= 5)) {  // in first 5 second send data to node 1
-      //String message1 = "00000000";
+      String message1 = "00000000";
       if (ack_node1 == false) {                    // if message is not received by the receiving node1
         sendMessage(message1, MasterNode, Node1);  // send message to node
         Serial.println("message send to node 1 ");
@@ -113,7 +113,7 @@ void loop() {
 
     if ((Secs >= 6) && (Secs <= 10)) {  // in next 5 seconds send data to node 2
 
-      //String message2 = "00000000";
+      String message2 = "00000000";
       if (ack_node2 == false) {                    // if message is not received by the receiving node2
         sendMessage(message2, MasterNode, Node2);  // send message to node
         //Serial.println("message send to node 2");

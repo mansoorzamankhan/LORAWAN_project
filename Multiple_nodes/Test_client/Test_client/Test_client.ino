@@ -98,7 +98,7 @@ void onReceive(int packetSize) {
     return;  // skip rest of function
   }
   if (sender == 0xFF) {
-    decode_message(incoming);
+    //decode_message(incoming);
     Serial.print(incoming);  // message from serer
     // print RSSI of packet
     Serial.print("' Signal Power ");
