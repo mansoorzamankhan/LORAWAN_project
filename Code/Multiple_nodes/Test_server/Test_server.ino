@@ -43,7 +43,7 @@ int Secs = 0;
 int counter1 = 0;
 int counter2 = 0;
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   // define int pins
   for (int i = 0; i < 16; i++) {
     pinMode(valve_input_f1[i], INPUT_PULLUP);

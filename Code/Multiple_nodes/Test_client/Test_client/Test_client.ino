@@ -22,10 +22,10 @@ void setup() {
     pinMode(valve_output[i], OUTPUT);
   }
   LoRa.setPins(ss, rst, dio0);
-  Serial.begin(9600);
+  Serial.begin(115200);
   while (!Serial)
     ;
-
+  Serial.println("");
   Serial.println("LoRa client(1)");
   if (!LoRa.begin(915E6)) {
     Serial.println("Starting LoRa failed!");
