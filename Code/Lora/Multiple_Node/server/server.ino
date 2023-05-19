@@ -37,9 +37,16 @@ unsigned long currentMillis = 0;
 unsigned long int start_time = 0;
 int interval = 5;  // updated every 1 second
 int Secs = 0;
-#define ss 10
-#define rst 9
+// //for arduino 
+// #define ss 10
+// #define rst 9
+// #define dio0 2
+
+//for esp32 
+#define ss 5
+#define rst 4
 #define dio0 2
+
 int counter1 = 0;
 int counter2 = 0;
 void setup() {
