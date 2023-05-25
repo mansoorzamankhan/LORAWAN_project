@@ -66,13 +66,13 @@ void setup() {
       ;
   }
 }
-void set_message_data(void) {
+void read_valves_status(void) {
   for (int i = 0; i < 16; i++) {
     valve_data_f1[i] = digitalRead(valve_input_f1[i]);
     valve_data_f2[i] = digitalRead(valve_input_f2[i]);
   }
 }
-void encode_message_data(void) {
+void encode_message(void) {
 
   for (int i = 0; i < 16; i + 2) {
 
@@ -95,11 +95,21 @@ void encode_message_data(void) {
   for (int i = 0; i < sizeof(node2_data) / sizeof(node2_data[0]); i++) {
     message1 += String(node1_data[i]);
     message2 += String(node2_data[i]);
+    Serial.print("Valves Status for node 1 :");
+    Serial.println(message1);
+    Serial.print("Valves Status for node 2 :");
+    Serial.println(message2);
+    
   }
+
+}
+void add_parity(String msg1 , String msg2)
+{
+
 }
 void loop() {
-  //set_message_data();
-  //encode_message_data();
+  read_valves_status();
+  encode_message();
   currentMillis = millis();
   currentsecs = currentMillis / 1000;
   // send paket time (11 second )
@@ -110,21 +120,21 @@ void loop() {
       Secs = 0;
     }
     if ((Secs >= 1) && (Secs <= 5)) {  // in first 5 second send data to node 1
-      String message1 = "00000000";
+      // message1 = "00000000";
       if (ack_node1 == false) {                    // if message is not received by the receiving node1
-        sendMessage(message1, MasterNode, Node1);  // send message to node
+        sendMessage(message1, MasterNode, Node1);  // send message to node1
         Serial.println("message send to node 1 ");
-        message1 = "";
+        message1 = ""; // clear message string after sending message
       }
     }
 
     if ((Secs >= 6) && (Secs <= 10)) {  // in next 5 seconds send data to node 2
 
-      String message2 = "00000000";
+      //message2 = "00000000";
       if (ack_node2 == false) {                    // if message is not received by the receiving node2
-        sendMessage(message2, MasterNode, Node2);  // send message to node
-        //Serial.println("message send to node 2");
-        message2 = "";
+        sendMessage(message2, MasterNode, Node2);  // send message to node2
+        Serial.println("message send to node 2");
+        message2 = ""; // clear message string after sending message
       }
     }
 
@@ -212,14 +222,3 @@ void onReceive(int packetSize) {
     }
   }
 }
-// void setValve()
-// {
-//   for ( byte i=0 ;i < Num_of_valves;i++)
-//   {
-//         if (  )
-//   {
-//     valve[i]==true;
-//   }
-//   }
-
-// }
