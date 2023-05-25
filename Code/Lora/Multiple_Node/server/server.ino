@@ -24,7 +24,7 @@ String message2 = "";
 byte MasterNode = 0xFF;  // address for master/server node
 byte Node1 = 0xBB;       // client node 1
 byte Node2 = 0xCC;       //client node 2
-String Message = "";
+
 String SenderNode = "";
 String outgoing;    // outgoing message
 byte msgCount = 0;  // count of outgoing messages
@@ -37,12 +37,12 @@ unsigned long currentMillis = 0;
 unsigned long int start_time = 0;
 int interval = 5;  // updated every 1 second
 int Secs = 0;
-// //for arduino 
+// //for arduino
 // #define ss 10
 // #define rst 9
 // #define dio0 2
 
-//for esp32 
+//for esp32
 #define ss 5
 #define rst 4
 #define dio0 2
@@ -56,15 +56,15 @@ void setup() {
     pinMode(valve_input_f1[i], INPUT_PULLUP);
     pinMode(valve_input_f2[i], INPUT_PULLUP);
   }
-  LoRa.setPins(ss, rst, dio0);
-  while (!Serial)
-    ;
-  Serial.println("LoRa server");
-  if (!LoRa.begin(915E6)) {
-    Serial.println("Starting LoRa failed!");
-    while (1)
-      ;
-  }
+  // LoRa.setPins(ss, rst, dio0);
+  // while (!Serial)
+  //   ;
+  // Serial.println("LoRa server");
+  // if (!LoRa.begin(915E6)) {
+  //   Serial.println("Starting LoRa failed!");
+  //   while (1)
+  //     ;
+  // }
 }
 void read_valves_status(void) {
   for (int i = 0; i < 16; i++) {
@@ -74,67 +74,77 @@ void read_valves_status(void) {
 }
 void encode_message(void) {
 
-  for (int i = 0; i < 16; i + 2) {
+  for (uint8_t i = 0; i < 16; i += 2) {
 
     if (valve_data_f1[i] == 1 && valve_data_f1[i + 1] == 0) {
       node1_data[j] = true;
-      j++;
+
     } else if (valve_data_f1[i] == 0 && valve_data_f1[i + 1] == 1) {
       node1_data[j] = false;
-      j++;
     }
-
     if (valve_data_f2[i] == 1 && valve_data_f2[i + 1] == 0) {
       node2_data[k] = true;
-      k++;
+
     } else if (valve_data_f2[i] == 0 && valve_data_f2[i + 1] == 1) {
       node2_data[k] = false;
-      k++;
     }
+
+    j++;
+    k++;
   }
-  for (int i = 0; i < sizeof(node2_data) / sizeof(node2_data[0]); i++) {
+    message1="";
+    message2="";
+  for (int i = 0; i < 8; i++) {
     message1 += String(node1_data[i]);
     message2 += String(node2_data[i]);
-    Serial.print("Valves Status for node 1 :");
-    Serial.println(message1);
-    Serial.print("Valves Status for node 2 :");
-    Serial.println(message2);
-    
+    // node2_data[i] = false;
+    // node1_data[i] = false;
   }
 
-}
-void add_parity(String msg1 , String msg2)
-{
 
+  // Serial.print("Valves Status for node 1 :");
+  // Serial.println(message1);
+  // Serial.print("Valves Status for node 2 :");
+  // Serial.println(message2);
+  j = 0;
+  k = 0;
 }
+
+
 void loop() {
   read_valves_status();
   encode_message();
+  // message1 = "";
+  // message2 = "";
   currentMillis = millis();
-  currentsecs = currentMillis / 1000;
-  // send paket time (11 second )
+  currentsecs = currentMillis / 1000;  //  send packet time (11 second )
+
   if ((unsigned long)(currentsecs - previoussecs) >= interval) {
     Secs = Secs + 1;
     //Serial.println(Secs);
     if (Secs >= 11) {  // reset time after 11 seconds
+
       Secs = 0;
     }
     if ((Secs >= 1) && (Secs <= 5)) {  // in first 5 second send data to node 1
-      // message1 = "00000000";
-      if (ack_node1 == false) {                    // if message is not received by the receiving node1
+      
+      if (ack_node1 == false) {  // if message is not received by the receiving node1
+
         sendMessage(message1, MasterNode, Node1);  // send message to node1
-        Serial.println("message send to node 1 ");
-        message1 = ""; // clear message string after sending message
+        Serial.print("message send to node 1 ");
+        Serial.println(message1);
+        message1 = "";  // clear message string after sending message
       }
     }
 
     if ((Secs >= 6) && (Secs <= 10)) {  // in next 5 seconds send data to node 2
+      
+      if (ack_node2 == false) {  // if message is not received by the receiving node2
 
-      //message2 = "00000000";
-      if (ack_node2 == false) {                    // if message is not received by the receiving node2
         sendMessage(message2, MasterNode, Node2);  // send message to node2
-        Serial.println("message send to node 2");
-        message2 = ""; // clear message string after sending message
+        Serial.print("message send to node 2 ");
+        Serial.println(message2);
+        message2 = "";  // clear message string after sending message
       }
     }
 
