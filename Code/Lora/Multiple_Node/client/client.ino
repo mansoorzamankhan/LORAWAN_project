@@ -15,7 +15,7 @@ https://www.electroniclinic.com/
 #define dio0 2
 
 
-int valve_output[16] = { 23, 25, 2, 29, 31, 33, 35, 37, 39, 41, 43, 45, 49, 51, 53 };  // pins for valves
+int valve_output[16] = { 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 49, 51, 53 };  // pins for valves
 String outgoing;
 int j = 0;  // outgoing message
 String SenderNode = "";
@@ -39,7 +39,7 @@ void setup() {
     while (1)
       ;
   } else {  // on power on send indication message to server
-    String message = "power_on(Node1)";
+    String message = "(Node1)powered_ON";
     sendMessage(message, MasterNode, Node1);
     delay(100);
   }

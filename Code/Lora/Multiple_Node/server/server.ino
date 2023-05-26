@@ -38,14 +38,14 @@ unsigned long int start_time = 0;
 int interval = 5;  // updated every 1 second
 int Secs = 0;
 // //for arduino
-// #define ss 10
-// #define rst 9
-// #define dio0 2
-
-//for esp32
-#define ss 5
-#define rst 4
+#define ss 10
+#define rst 9
 #define dio0 2
+
+// //for esp32
+// #define ss 5
+// #define rst 4
+// #define dio0 2
 
 int counter1 = 0;
 int counter2 = 0;
@@ -56,15 +56,15 @@ void setup() {
     pinMode(valve_input_f1[i], INPUT_PULLUP);
     pinMode(valve_input_f2[i], INPUT_PULLUP);
   }
-  // LoRa.setPins(ss, rst, dio0);
-  // while (!Serial)
-  //   ;
-  // Serial.println("LoRa server");
-  // if (!LoRa.begin(915E6)) {
-  //   Serial.println("Starting LoRa failed!");
-  //   while (1)
-  //     ;
-  // }
+  LoRa.setPins(ss, rst, dio0);
+  while (!Serial)
+    ;
+  Serial.println("LoRa server");
+  if (!LoRa.begin(915E6)) {
+    Serial.println("Starting LoRa failed!");
+    while (1)
+      ;
+  }
 }
 void read_valves_status(void) {
   for (int i = 0; i < 16; i++) {
@@ -100,12 +100,6 @@ void encode_message(void) {
     // node2_data[i] = false;
     // node1_data[i] = false;
   }
-
-
-  // Serial.print("Valves Status for node 1 :");
-  // Serial.println(message1);
-  // Serial.print("Valves Status for node 2 :");
-  // Serial.println(message2);
   j = 0;
   k = 0;
 }
@@ -121,13 +115,10 @@ void loop() {
 
   if ((unsigned long)(currentsecs - previoussecs) >= interval) {
     Secs = Secs + 1;
-    //Serial.println(Secs);
     if (Secs >= 11) {  // reset time after 11 seconds
-
       Secs = 0;
     }
-    if ((Secs >= 1) && (Secs <= 5)) {  // in first 5 second send data to node 1
-      
+    if ((Secs >= 1) && (Secs <= 5)) {  // in first 5 second send data to node 1     
       if (ack_node1 == false) {  // if message is not received by the receiving node1
 
         sendMessage(message1, MasterNode, Node1);  // send message to node1
