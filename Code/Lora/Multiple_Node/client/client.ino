@@ -6,13 +6,13 @@ https://www.electroniclinic.com/
 #include <SPI.h>  // include libraries
 #include <LoRa.h>
 //for arduino 
-// #define ss 10
-// #define rst 9
-// #define dio0 2
-//for esp32 
-#define ss 5
-#define rst 4
+#define ss 10
+#define rst 9
 #define dio0 2
+//for esp32 
+// #define ss 5
+// #define rst 4
+// #define dio0 2
 
 
 int valve_output[16] = { 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 49, 51, 53 };  // pins for valves

@@ -42,7 +42,7 @@ int Secs = 0;
 #define rst 9
 #define dio0 2
 
-// //for esp32
+//for esp32
 // #define ss 5
 // #define rst 4
 // #define dio0 2
@@ -76,16 +76,16 @@ void encode_message(void) {
 
   for (uint8_t i = 0; i < 16; i += 2) {
 
-    if (valve_data_f1[i] == 1 && valve_data_f1[i + 1] == 0) {
+    if (valve_data_f1[i] == 1 && valve_data_f1[i + 1] == 1) {
       node1_data[j] = true;
 
-    } else if (valve_data_f1[i] == 0 && valve_data_f1[i + 1] == 1) {
+    } else if (valve_data_f1[i] == 1 && valve_data_f1[i + 1] == 0) {
       node1_data[j] = false;
     }
-    if (valve_data_f2[i] == 1 && valve_data_f2[i + 1] == 0) {
+    if (valve_data_f2[i] == 1 && valve_data_f2[i + 1] == 1) {
       node2_data[k] = true;
 
-    } else if (valve_data_f2[i] == 0 && valve_data_f2[i + 1] == 1) {
+    } else if (valve_data_f2[i] == 1 && valve_data_f2[i + 1] == 0) {
       node2_data[k] = false;
     }
 
@@ -133,8 +133,8 @@ void loop() {
       if (ack_node2 == false) {  // if message is not received by the receiving node2
 
         sendMessage(message2, MasterNode, Node2);  // send message to node2
-        Serial.print("message send to node 2 ");
-        Serial.println(message2);
+        //Serial.print("message send to node 2 ");
+        //Serial.println(message2);
         message2 = "";  // clear message string after sending message
       }
     }
@@ -144,6 +144,7 @@ void loop() {
 
   // parse for a packet, and call onReceive with the result:
   onReceive(LoRa.parsePacket());  // receive data from client nodes
+
 }
 
 
