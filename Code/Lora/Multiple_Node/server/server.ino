@@ -100,6 +100,7 @@ void encode_message(void) {
     // node2_data[i] = false;
     // node1_data[i] = false;
   }
+  
   j = 0;
   k = 0;
 }
@@ -119,13 +120,13 @@ void loop() {
       Secs = 0;
     }
     if ((Secs >= 1) && (Secs <= 5)) {  // in first 5 second send data to node 1     
-      if (ack_node1 == false) {  // if message is not received by the receiving node1
+      //if (ack_node1 == false) {  // if message is not received by the receiving node1
 
         sendMessage(message1, MasterNode, Node1);  // send message to node1
         Serial.print("message send to node 1 ");
         Serial.println(message1);
         message1 = "";  // clear message string after sending message
-      }
+     // }
     }
 
     if ((Secs >= 6) && (Secs <= 10)) {  // in next 5 seconds send data to node 2
@@ -202,7 +203,7 @@ void onReceive(int packetSize) {
       Serial.println(LoRa.packetRssi());
       ack_node1 = true;
     }
-    if (incoming == "power_on(Node1)") {
+    if (incoming == "(Node1)powered_ON") {
       Serial.println("Node 1 :powered on");
       // print RSSI of packet
       ack_node1 = false;
@@ -217,7 +218,7 @@ void onReceive(int packetSize) {
       Serial.println(LoRa.packetRssi());
       ack_node2 = true;
     }
-    if (incoming == "power_on(Node2)") {
+    if (incoming == "(Node2)powered_ON") {
       Serial.println("Node 2 :powered on");
       // print RSSI of packet
       ack_node2 = false;

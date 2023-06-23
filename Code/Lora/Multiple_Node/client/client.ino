@@ -13,7 +13,7 @@ https://www.electroniclinic.com/
 // #define ss 5
 // #define rst 4
 // #define dio0 2
-
+String incoming = "";
 
 int valve_output[16] = { 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 49, 51, 53 };  // pins for valves
 String outgoing;
@@ -48,6 +48,7 @@ void setup() {
 void loop() {
   // parse for a packet, and call onReceive with the result:
   onReceive(LoRa.parsePacket());  // receive data from server
+  decode_message(incoming);
 }
 void decode_message(String incoming) {
   for (int i = 0; i < incoming.length(); i++) {
@@ -86,7 +87,7 @@ void onReceive(int packetSize) {
   byte incomingMsgId = LoRa.read();   // incoming msg ID
   byte incomingLength = LoRa.read();  // incoming msg length
 
-  String incoming = "";
+   incoming = "";
 
   while (LoRa.available()) {
     incoming += (char)LoRa.read();
